@@ -1,0 +1,35 @@
+[
+  {
+    "Language": "English",
+    "Levels": {
+      "A1": "eng_gen_a1",
+      "A2": "eng_gen_a2",
+      "B1": "eng_gen_b1",
+      "B2": "eng_gen_b2",
+      "C1": "eng_gen_c1"
+    },
+    "Cloudlearning": "english_cloud"
+  },
+  {
+    "Language": "Deutsch",
+    "Levels": {
+      "A1": "ger_gen_a1",
+      "A2": "ger_gen_a2",
+      "B1": "ger_gen_b1",
+      "B2": "ger_gen_b2",
+      "C1": "ger_gen_c1"
+    },
+    "Cloudlearning": "german_cloud"
+  },
+  {
+    "Language": "Français",
+    "Levels": {
+      "A1": "fr_gen_a1_v2",
+      "A2": "fr_gen_a2_v2",
+      "B1": "fr_gen_b1",
+      "B2": "fr_gen_b2",
+      "C1": "fr_gen_c1"
+    },
+    "Cloudlearning": "french_cloud"
+  }
+]
