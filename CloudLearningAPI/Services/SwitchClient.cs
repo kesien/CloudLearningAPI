@@ -44,7 +44,7 @@ namespace CloudLearningAPI.Services
                 new KeyValuePair<string, string>("pwd", password),
             });
 
-            HttpResponseMessage result = await _httpClient.PostAsync($"{_settings.SwitchBoardHost}fl-teach/main.php", content);
+            HttpResponseMessage result = await _httpClient.PostAsync($"{_settings.SwitchBoardHost}fl-teach/main0.php", content);
             string response = await result.Content.ReadAsStringAsync();
             if (result.StatusCode != HttpStatusCode.OK || response.Contains("Invalid username or password"))
             {
