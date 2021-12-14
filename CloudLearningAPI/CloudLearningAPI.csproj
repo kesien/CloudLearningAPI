@@ -38,4 +38,8 @@
     </EmbeddedResource>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include=".circleci\configuration.yml" />
+  </ItemGroup>
+
 </Project>
