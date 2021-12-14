@@ -47,6 +47,10 @@ namespace CloudLearningAPI
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "CloudLearningAPI v1"));
             }
 
+            app.UseCors(options =>
+            {
+                options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+            });
             app.UseHttpsRedirection();
 
             app.UseRouting();
