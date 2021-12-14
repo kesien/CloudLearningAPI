@@ -6,7 +6,6 @@ using Microsoft.Extensions.Configuration;
 
 namespace CloudLearningAPI.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("[controller]")]
     [ApiController]
     public class FilesController : ControllerBase
