@@ -47,8 +47,8 @@ namespace CloudLearningAPI.Controllers
                 {
                     continue;
                 }
-                var importFile = (courseDto.Homework || courseDto.Cloudlearning || courseDto.Ebook) ? _fileService.GenerateImportFile(course, courseDto.Cloudlearning, courseDto.Homework, courseDto.Ebook) : null;
-                var wordFile = (courseDto.Homework || courseDto.Ebook) ? _fileService.GenerateWordDoc(course) : null;
+                var importFile = (courseDto.Homework || courseDto.Cloudlearning || courseDto.Ebook) ? await _fileService.GenerateImportFile(course, courseDto.Cloudlearning, courseDto.Homework, courseDto.Ebook) : null;
+                var wordFile = (courseDto.Homework || courseDto.Ebook) ? await _fileService.GenerateWordDoc(course) : null;
                 result.Add(new CourseDto 
                 {
                     Id = Guid.NewGuid(),
@@ -56,8 +56,8 @@ namespace CloudLearningAPI.Controllers
                     Language = course.Language,
                     Level = course.Level,
                     Participants = course.Participants,
-                    WordFilePath = wordFile is not null ? $"word/{wordFile}" : null,
-                    ImportFilePath = importFile is not null ? $"import/{importFile}" : null
+                    WordFilePath = wordFile is not null ? $"WordFiles/{wordFile}" : null,
+                    ImportFilePath = importFile is not null ? $"ImportFiles/{importFile}" : null
                 });
             }
             return result;
