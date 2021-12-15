@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using CloudLearningAPI.Interfaces;
 using CloudLearningAPI.Services;
 using CloudLearningAPI.Repositories;
+using Microsoft.AspNetCore.Http;
 
 namespace CloudLearningAPI.Extensions
 {
@@ -23,8 +24,15 @@ namespace CloudLearningAPI.Extensions
                 CookieContainer = cookieContainer,
                 UseCookies = true
             });
-            
+
+
             return services;
+        }
+        public static void AddApplicationError(this HttpResponse response, string message)
+        {
+            response.Headers.Add("Application-Error", message);
+            response.Headers.Add("Access-Control-Expose-Headers", "Application-Error");
+            response.Headers.Add("Access-Control-Allow-Origin", "*");
         }
     }
 }

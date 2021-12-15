@@ -60,6 +60,11 @@ namespace CloudLearningAPI.Services
             string fullCourseNumber = $"{course.Coursenumber}/{DateTime.Now.ToString("yy")}";
             string fileName = $"{course.Coursenumber}_{DateTime.Now.ToString("yyyyMMdd-HHmmss")}.docx";
             string fullPath = Path.Combine(_wordSavePath, fileName);
+            // Delete old files
+            foreach (var file in Directory.EnumerateFiles(_wordSavePath))
+            {
+                File.Delete(file);
+            }
             using (DocX document = DocX.Load(_baseDocument))
             {
                 document.ReplaceText("{coursenumber}", fullCourseNumber);
@@ -89,7 +94,11 @@ namespace CloudLearningAPI.Services
             string fileName = $"{course.Coursenumber}_{DateTime.Now.ToString("yyyyMMdd-HHmmss")}.csv";
             string level = course.Level.Split('/')[0];
             string ebookString = null;
-            
+            // Delete old files
+            foreach (var file in Directory.EnumerateFiles(_importFileSavePath))
+            {
+                File.Delete(file);
+            }
             LanguageModel language = _supportedLanguages.Where(language => language.Language == course.Language).FirstOrDefault();
             if (language is null)
             {
