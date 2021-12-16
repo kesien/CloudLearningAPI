@@ -8,10 +8,10 @@ using Xceed.Document.NET;
 using Xceed.Words.NET;
 using CloudLearningAPI.Models;
 using CloudLearningAPI.Properties;
-using Microsoft.Extensions.Configuration;
 using CloudLearningAPI.Interfaces;
 using CsvHelper;
 using System.Globalization;
+using System.Threading.Tasks;
 
 namespace CloudLearningAPI.Services
 {
@@ -20,32 +20,17 @@ namespace CloudLearningAPI.Services
 
         private Stream _baseDocument;
         private List<LanguageModel> _supportedLanguages;
-        private readonly string _wordSavePath;
-        private readonly string _importFileSavePath;
+        private readonly IDropboxService _dropboxService;
 
         #region Constructor
         /// <summary>
         /// Default constructor
         /// </summary>
-        public FileService(IConfiguration configuration)
+        public FileService(IDropboxService dropboxService)
         {
-            _wordSavePath = configuration["WordPath"] ?? "./Files/Word/";
-            _importFileSavePath = configuration["ImportFilePath"] ?? "./Files/Import/";
             _supportedLanguages = LoadLanguagesFromJSON();
             _baseDocument = LoadBaseDocument();
-            checkDirectories();
-        }
-
-        private void checkDirectories()
-        {
-            if (!Directory.Exists(_importFileSavePath)) 
-            {
-                Directory.CreateDirectory(_importFileSavePath);
-            }
-            if (!Directory.Exists(_wordSavePath))
-            {
-                Directory.CreateDirectory(_wordSavePath);
-            }
+            _dropboxService = dropboxService;
         }
         #endregion
 
@@ -55,15 +40,14 @@ namespace CloudLearningAPI.Services
         /// </summary>
         /// <param name="course"></param>
         /// <returns></returns>
-        public string GenerateWordDoc(Course course)
+        public async Task<string> GenerateWordDoc(Course course)
         {
             string fullCourseNumber = $"{course.Coursenumber}/{DateTime.Now.ToString("yy")}";
             string fileName = $"{course.Coursenumber}_{DateTime.Now.ToString("yyyyMMdd-HHmmss")}.docx";
-            string fullPath = Path.Combine(_wordSavePath, fileName);
-            // Delete old files
-            foreach (var file in Directory.EnumerateFiles(_wordSavePath))
+            string fullPath = Path.Combine("./WordFiles", fileName);
+            if (!Directory.Exists("./WordFiles"))
             {
-                File.Delete(file);
+                Directory.CreateDirectory("./WordFiles");
             }
             using (DocX document = DocX.Load(_baseDocument))
             {
@@ -83,22 +67,35 @@ namespace CloudLearningAPI.Services
                     document.SaveAs(fs);
                 }
             }
+            using (MemoryStream ms = new MemoryStream(File.ReadAllBytes(fullPath)))
+            {
+                var result = await _dropboxService.UploadFile(fullPath, ms);
+                if (!result)
+                {
+                    return null;
+                }
+            }
+            foreach (var file in Directory.EnumerateFiles("./WordFiles"))
+            {
+                File.Delete(file);
+            }
             return fileName;
         }
         #endregion
 
         #region Import File generator
-        public string GenerateImportFile(Course course, bool cloudlearning = false, bool homework = false, bool ebook = false)
+        public async Task<string> GenerateImportFile(Course course, bool cloudlearning = false, bool homework = false, bool ebook = false)
         {
             string fullCourseNumber = $"{course.Coursenumber}/{DateTime.Now.ToString("yy")}";
             string fileName = $"{course.Coursenumber}_{DateTime.Now.ToString("yyyyMMdd-HHmmss")}.csv";
+            string fullPath = Path.Combine("./ImportFiles", fileName);
             string level = course.Level.Split('/')[0];
             string ebookString = null;
-            // Delete old files
-            foreach (var file in Directory.EnumerateFiles(_importFileSavePath))
+            if (!Directory.Exists("./ImportFiles"))
             {
-                File.Delete(file);
+                Directory.CreateDirectory("./ImportFiles");
             }
+
             LanguageModel language = _supportedLanguages.Where(language => language.Language == course.Language).FirstOrDefault();
             if (language is null)
             {
@@ -120,12 +117,24 @@ namespace CloudLearningAPI.Services
                 Ebook = ebook ? ebookString : null,
                 Group = ebook ? course.Coursenumber : null
             }).ToList();
-            using (var writer = new StreamWriter(Path.Combine(_importFileSavePath, fileName)))
+            using (var writer = new StreamWriter(fullPath))
             {
                 using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
                 {
                     csv.WriteRecords(importData);
                 }
+            }
+            using (MemoryStream ms = new MemoryStream(File.ReadAllBytes(fullPath)))
+            {
+                var result = await _dropboxService.UploadFile(Path.Combine("ImportFiles", fileName), ms);
+                if (!result)
+                {
+                    return null;
+                }
+            }
+            foreach (var file in Directory.EnumerateFiles("./ImportFiles"))
+            {
+                File.Delete(file);
             }
             return fileName;
         }

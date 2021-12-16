@@ -1,10 +1,11 @@
 ﻿using CloudLearningAPI.Models;
+using System.Threading.Tasks;
 
 namespace CloudLearningAPI.Interfaces
 {
     public interface IFileService
     {
-        string GenerateImportFile(Course course, bool cloudlearning = false, bool homework = false, bool ebook = false);
-        string GenerateWordDoc(Course course);
+        Task<string> GenerateImportFile(Course course, bool cloudlearning = false, bool homework = false, bool ebook = false);
+        Task<string> GenerateWordDoc(Course course);
     }
 }

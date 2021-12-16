@@ -1,4 +1,6 @@
 using System.IO;
+using System.Threading.Tasks;
+using CloudLearningAPI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -6,27 +8,24 @@ using Microsoft.Extensions.Configuration;
 
 namespace CloudLearningAPI.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class FilesController : ControllerBase
     {
-        private readonly string _wordSavePath;
-        private readonly string _importPath;
-        public FilesController(IConfiguration config)
+        private readonly IDropboxService _dropboxService;
+        public FilesController(IDropboxService dropboxService)
         {
-            _wordSavePath = config["WordPath"];
-            _importPath = config["ImportFilePath"];
+            _dropboxService = dropboxService;
         }
 
-        [HttpGet("import/{filename}")]
-        public ActionResult DownloadImportFile(string filename) 
+        [HttpGet("{dirname}/{filename}")]
+        public async Task<IActionResult> DownloadImportFile(string dirname, string filename) 
         {
-            var filePath = Path.Combine(_importPath, filename);
-            if (!System.IO.File.Exists(filePath))
+            var file = await _dropboxService.GetFile($"/{dirname}/{filename}");
+            if (file is null)
             {
-                return NotFound();
+                return NotFound($"Couldn't find file: {filename}");
             }
-            var file = System.IO.File.ReadAllBytes(filePath);
             var result = new FileContentResult(file, "application/octet-stream")
             {
                 FileDownloadName = filename
@@ -35,21 +34,5 @@ namespace CloudLearningAPI.Controllers
             return result;
         }
         
-        [HttpGet("word/{filename}")]
-        public ActionResult DownloadWordFile(string filename)
-        {
-            var filePath = Path.Combine(_wordSavePath, filename);
-            if (!System.IO.File.Exists(filePath))
-            {
-                return NotFound();
-            }
-            var file = System.IO.File.ReadAllBytes(filePath);
-            var result = new FileContentResult(file, "application/octet-stream")
-            {
-                FileDownloadName = filename
-            };
-
-            return result;
-        }
     }
 }

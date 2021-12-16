@@ -17,6 +17,7 @@ namespace CloudLearningAPI.Extensions
             CookieContainer cookieContainer = new();
             services.AddSingleton(cookieContainer);
             services.AddScoped<IFileService, FileService>();
+            services.AddScoped<IDropboxService, DropboxService>();
             services.AddScoped<ICourseRepository, CourseRepository>();
             services.AddSingleton<IJwtAuthenticationManager, JwtAuthenticationManager>();
             services.AddScoped<IDataParser, DataParser>();
