@@ -96,11 +96,7 @@ namespace CloudLearningAPI.Services
                 Directory.CreateDirectory("./ImportFiles");
             }
 
-            LanguageModel language = _supportedLanguages.Where(language => language.Language == course.Language).FirstOrDefault();
-            if (language is null)
-            {
-                return null;
-            }
+            LanguageModel? language = _supportedLanguages.Where(language => language.Language == course.Language).FirstOrDefault();
             if (ebook && level is not null) 
             {
                 PropertyInfo pinfo = typeof(Level).GetProperty(level);
@@ -112,7 +108,7 @@ namespace CloudLearningAPI.Services
                 Email = participant.Email,
                 Firstname = participant.Firstname,
                 Lastname = participant.Lastname,
-                Cohort = cloudlearning ? language.Cloudlearning : null,
+                Cohort = cloudlearning ? language?.Cloudlearning : null,
                 Homework = homework ? $"{course.Coursenumber}/{DateTime.Now.ToString("yy")}" : null,
                 Ebook = ebook ? ebookString : null,
                 Group = ebook ? course.Coursenumber : null
