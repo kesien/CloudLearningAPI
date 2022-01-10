@@ -90,6 +90,8 @@ namespace CloudLearningAPI.Services
             string fileName = $"{course.Coursenumber}_{DateTime.Now.ToString("yyyyMMdd-HHmmss")}.csv";
             string fullPath = Path.Combine("./ImportFiles", fileName);
             string level = course.Level.Split('/')[0];
+            if (level == "C2")
+                level = "C1";
             string ebookString = null;
             if (!Directory.Exists("./ImportFiles"))
             {
