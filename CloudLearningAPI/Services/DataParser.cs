@@ -2,6 +2,7 @@
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Xml;
 using CloudLearningAPI.Interfaces;
 using CloudLearningAPI.Models;
@@ -19,9 +20,14 @@ namespace CloudLearningAPI.Services
         private DataSet XMLToDataSet(Stream dataStream)
         {
             DataSet ds = new();
-
+            string content = "";
+            using (StreamReader reader = new(dataStream, Encoding.GetEncoding("iso-8859-1")))
+            {
+                content = reader.ReadToEnd();
+                content = content.Replace( "&","&amp;");
+            }
             XmlDocument xml = new();
-            xml.Load(dataStream);
+            xml.LoadXml(content);
             XmlNamespaceManager nsmgr = new XmlNamespaceManager(xml.NameTable);
             nsmgr.AddNamespace("ss", "urn:schemas-microsoft-com:office:spreadsheet");
             XmlElement root = xml.DocumentElement;
